@@ -111,7 +111,6 @@ const debounce = __webpack_require__(3);
 
 
 const NAME = 'datasource';
-const JQUERY_NO_CONFLICT = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME];
 const Selector = {
   CONTAINER: '.datasource-container',
   LENGTH: '.datasource-length',
@@ -125,90 +124,47 @@ const Event = {
 };
 /**
  * ------------------------------------------------------------------------
- * Class Definition
+ * Plugin Definition
  * ------------------------------------------------------------------------
  */
 
-class Datasource {
-  constructor(element, options) {
-    this.element = element;
-    this._options = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME].defaults, options);
-    this._parameters = {
-      'perPage': 10,
-      'filter': {},
-      'sort': {}
-    };
-    this.applyFilter = debounce(this.applyFilter, this._options.debounce);
+jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME] = function (options) {
+  let _this = this;
 
-    this._init();
-  } // Public
+  let _options = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME].defaults, options);
+
+  let _parameters = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, {
+    'perPage': 10,
+    'filter': {},
+    'sort': {}
+  }, jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME].defaults.parameters); // Private
 
 
-  refresh() {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()(this.element).trigger(Event.REFRESHING);
-    jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax(this._getAjaxOptions()).then(response => {
-      this._handleSuccessfullRefresh(response);
-    }).always(() => {
-      this._handleRefreshCompleted();
-    });
-  }
-
-  changeLength(length) {
-    this._parameters.perPage = length;
-
-    this._updateState();
-  }
-
-  goToPage(page) {
-    this._parameters.page = page;
-
-    this._updateState();
-  }
-
-  applyFilter(name, value) {
-    this._parameters.filter[name] = value;
-
-    this._updateState();
-  }
-
-  removeFilter(name) {
-    delete this._parameters.filter[name];
-
-    this._updateState();
-  }
-
-  applySort(name, direction = 'asc') {
-    this._parameters.sort[name] = direction;
-
-    this._updateState();
-  } // Private
-
-
-  _updateState() {
-    history.pushState(this._parameters, '', "?" + jquery__WEBPACK_IMPORTED_MODULE_0___default.a.param(this._parameters));
+  let _updateState = () => {
+    history.pushState(_parameters, '', "?" + jquery__WEBPACK_IMPORTED_MODULE_0___default.a.param(_parameters));
     this.refresh();
-  }
+  };
 
-  _getAjaxOptions() {
+  let _getAjaxOptions = () => {
     return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, {
-      url: this._options.url,
-      data: this._parameters
-    }, this._options.ajax);
-  }
+      url: _options.url,
+      data: _parameters
+    }, _options.ajax);
+  };
 
-  _handleSuccessfullRefresh(response) {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()(this.element).find(Selector.CONTAINER).html(response.data);
-  }
+  let _handleSuccessfullRefresh = response => {
+    this.find(Selector.CONTAINER).html(response.data);
+  };
 
-  _handleRefreshCompleted() {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()(this.element).trigger(Event.REFRESHED);
-  }
+  let _handleRefreshCompleted = () => {
+    this.trigger(Event.REFRESHED);
+  };
 
-  _handleLengthChange(element) {
+  let _handleLengthChange = element => {
     this.changeLength(jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).val());
-  }
+  };
 
-  _handlePageChange(element) {
+  let _handlePageChange = element => {
     let page = jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).data('page');
 
     if (!page) {
@@ -216,19 +172,19 @@ class Datasource {
     }
 
     this.goToPage(page);
-  }
+  };
 
-  _handleFiltering(element) {
+  let _handleFiltering = element => {
     let filter = jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).data('filter');
 
     if (!filter) {
       throw new Error('Missing data-filter attribute');
     }
 
-    this.applyFilter(filter, jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).val(), jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).data('debounce') || 0);
-  }
+    this.applyFilter(filter, jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).val());
+  };
 
-  _handleSorting(element) {
+  let _handleSorting = element => {
     let sort = jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).data('sort');
 
     if (!sort) {
@@ -236,74 +192,115 @@ class Datasource {
     }
 
     this.applySort(sort, jquery__WEBPACK_IMPORTED_MODULE_0___default()(element).data('direction'));
-  }
+  };
 
-  _parseQueryParameters() {
+  let _parseQueryParameters = () => {
     const parsed = deparam(window.location.search.split('?')[1] || '');
     this._parameters = jquery__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, this._parameters, parsed);
-  }
+  };
 
-  _init() {
-    let _this = this;
-
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()(this.element).on('change', Selector.LENGTH, function (event) {
+  let _init = () => {
+    this.on('change', Selector.LENGTH, function (event) {
       event.preventDefault();
 
-      _this._handleLengthChange(this);
+      _handleLengthChange(this);
     }).on('click', Selector.PAGINATION, function (event) {
       event.preventDefault();
 
-      _this._handlePageChange(this);
+      _handlePageChange(this);
     }).on('change input', Selector.FILTER, function (event) {
-      _this._handleFiltering(this);
+      _handleFiltering(this);
     }).on('click', Selector.SORT, function (event) {
-      _this._handleSorting(this);
+      _handleSorting(this);
     });
 
-    this._parseQueryParameters();
+    _parseQueryParameters();
 
     window.onpopstate = function (event) {
-      _this._parameters = event.state;
+      _parameters = event.state;
 
       _this.refresh();
     };
-  } // Static
+
+    return this;
+  }; // Public
 
 
-  static _jQueryInterface(options = {}) {
-    return this.each(function () {
-      const $element = jquery__WEBPACK_IMPORTED_MODULE_0___default()(this);
-      let data = $element.data(NAME);
-
-      if (!data) {
-        data = new Datasource(this, options);
-        $element.data(NAME, data);
-      }
+  this.refresh = () => {
+    this.trigger(Event.REFRESHING);
+    jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax(_getAjaxOptions()).then(response => {
+      _handleSuccessfullRefresh(response);
+    }).always(() => {
+      _handleRefreshCompleted();
     });
-  }
+    return this;
+  };
 
-}
-/**
- * ------------------------------------------------------------------------
- * jQuery
- * ------------------------------------------------------------------------
- */
+  this.changeLength = length => {
+    _parameters.perPage = length;
 
+    _updateState();
 
-jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME] = Datasource._jQueryInterface;
-jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME].Constructor = Datasource;
+    return this;
+  };
+
+  this.goToPage = page => {
+    _parameters.page = page;
+
+    _updateState();
+
+    return this;
+  };
+
+  this.applyFilter = debounce(function (name, value) {
+    _parameters.filter[name] = value;
+
+    _updateState();
+
+    return _this;
+  }, _options.debounce);
+
+  this.removeFilter = name => {
+    delete _parameters.filter[name];
+
+    _updateState();
+
+    return this;
+  };
+
+  this.applySort = (name, direction = 'asc') => {
+    _parameters.sort[name] = direction;
+
+    _updateState();
+
+    return this;
+  };
+
+  this.setParameter = (name, value) => {
+    _parameters[name] = value;
+
+    _updateState();
+
+    return this;
+  };
+
+  this.removeParameter = name => {
+    delete _parameters[name];
+
+    _updateState();
+
+    return this;
+  };
+
+  return _init();
+};
+
 jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME].defaults = {
   url: '',
   ajax: {},
+  parameters: {},
   debounce: 300
 };
-
-jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME].noConflict = () => {
-  jquery__WEBPACK_IMPORTED_MODULE_0___default.a.fn[NAME] = JQUERY_NO_CONFLICT;
-  return Datasource._jQueryInterface;
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (Datasource);
 
 /***/ }),
 /* 2 */

@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <title>Hello, world!</title>
+    <title>Datasource Example</title>
   </head>
   <body>
     <div class="container">
@@ -67,17 +67,28 @@
   
     <script src="../dist/jquery-datasource.js"></script>
     <script>
+      // set default parameters
         $.extend(true, $.fn.datasource.defaults, {
-          "ajax": {
+          ajax: {
             method: "POST",
+          },
+          parameters: {
+            'default': 'default'
           }
         });
 
-        $(".datasource-wrapper").datasource({
+        // start plugin
+        var $datasource = $(".datasource-wrapper").datasource({
           url: "api.json"
         })
         .on('refreshing', () => {console.log('refreshing...')})
         .on('refreshed', () => {console.log('refreshed')});
+
+        // apply a filter manually
+        $datasource.applyFilter('test', '1');
+
+        // set a parameter manually
+        $datasource.setParameter('test', 'test');
     </script>
 </body>
 </html>
