@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "deparam": "^1.0.5",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "lodash.debounce": "^4.0.8"
   }
 }
